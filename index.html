@@ -145,7 +145,7 @@
         </script>
     </head>
     <body>
-        <script nonce="e388235d-6ca3-4063-90c7-2caba25d363a">
+        <script>
             document.documentElement.classList.replace('adaptive', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         </script>
         
@@ -153,10 +153,17 @@
             <div id="loading" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #f8f5ef; z-index: 9999;">
                 <div style="text-align: center; font-family: Arial, sans-serif;">
                     <div style="width: 50px; height: 50px; border: 5px solid #e09f3e; border-top: 5px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-                    <p style="margin-top: 20px; color: #4d472e;">Loading...</p>
+                    <p style="margin-top: 20px; color: #4d472e;" id="loadingText">Loading resources...</p>
+                    <p style="margin-top: 10px; color: #4d472e; font-size: 14px;" id="loadingProgress"></p>
                 </div>
             </div>
         </div>
+        
+        <script>
+            window.addEventListener('DOMContentLoaded', function() {
+                window['__canva_public_path__'] = 'assets/';
+                window['__canva_website_bootstrap__'] = JSON.parse('{"A":"DAGqsQvErfk","B":"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwia2lkIjoia2lkLTE3NDAwODM2MjAyNzEifQ..N-3qHw6X4sSsrF8q.9Soe-3_2pITxLcSHhyinWKP8Lruz3sdJe9-VM_1f-3eS0vnAxVleRYwlNb9ByrUsXejyMgGNaQ.akTls4XgBz92OCcwMVo9HQ"}');
+            });
         <style>
             @keyframes spin {
                 0% { transform: rotate(0deg); }
