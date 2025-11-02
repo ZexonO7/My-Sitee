@@ -123,17 +123,19 @@
         <script nonce="e388235d-6ca3-4063-90c7-2caba25d363a">
             window.C_CAPTCHA_KEY = '6LdpNmIrAAAAAHQVezN3pBAfDjQQ2qUpo881f24o';
         </script>
+        <script>
+            window['__canva_website_bootstrap__'] = JSON.parse('{"A":"DAGqsQvErfk","B":"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwia2lkIjoia2lkLTE3NDAwODM2MjAyNzEifQ..N-3qHw6X4sSsrF8q.9Soe-3_2pITxLcSHhyinWKP8Lruz3sdJe9-VM_1f-3eS0vnAxVleRYwlNb9ByrUsXejyMgGNaQ.akTls4XgBz92OCcwMVo9HQ"}');
+            window['__canva_public_path__'] = 'assets/';
+            window['cmsg'] = window['cmsg'] || {
+                locale: "en",
+                strings: {}
+            };
+        </script>
     </head>
     <body>
         <script nonce="e388235d-6ca3-4063-90c7-2caba25d363a">
             document.documentElement.classList.replace('adaptive', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         </script>
-        
-        <!-- Load all preloaded scripts -->
-        <script src="assets/fa200369325f15c3.runtime.js" crossorigin="anonymous" integrity="sha512-jGo6iHaEfNKHgGDkqVZz3TV/HLSshaMJmS/hN165ME79CsTVVY2qvqDAS9FVHUJVHiusMejFPpDSkZc51k+O+g==" nonce="e388235d-6ca3-4063-90c7-2caba25d363a"></script>
-        <script src="assets/8b151872c2943599.s4le6a.vendor.js" crossorigin="anonymous" integrity="sha512-KJAdcUiZ6jKP2GojrwYTpg99GzeZjLyB5XDqIYGsPO8YNjq8Rx2bjEAfg8gXlL55c6l5yOyPQ2LXoUFy03xH6w==" nonce="e388235d-6ca3-4063-90c7-2caba25d363a"></script>
-        <script src="assets/9387c6b85eab150d.vendor.js" crossorigin="anonymous" integrity="sha512-PBIBAUluHFtVu3sHEX4n4EpJNsf5Kgjduhw3br8TysGY96wD29kJCwfDin9YCxBgbhLrHCKjYwlyPxoGWQtC4Q==" nonce="e388235d-6ca3-4063-90c7-2caba25d363a"></script>
-        <script src="assets/a35845dde8b2488a.js" crossorigin="anonymous" integrity="sha512-4i0jhUJuN1jriK+IDKAEqW97BhuKwxbsB/IRD8jMIkkMsO6x4WrXXSUMfhNaKO7vnR4FyE2L2DwkQZHGrCzXbQ==" nonce="e388235d-6ca3-4063-90c7-2caba25d363a"></script>
         
         <div id="root">
             <div id="loading" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #f8f5ef; z-index: 9999;">
@@ -152,14 +154,49 @@
         <script nonce="e388235d-6ca3-4063-90c7-2caba25d363a">
             document.addEventListener('DOMContentLoaded', function() {
                 const loadingEl = document.getElementById('loading');
-                // Hide loading when the main script finishes
-                window.addEventListener('load', () => {
-                    setTimeout(() => {
-                        if(loadingEl) {
+                let scriptsLoaded = false;
+
+                async function initializeApp() {
+                    try {
+                        // Load all required scripts sequentially
+                        const scripts = [
+                            'assets/fa200369325f15c3.runtime.js',
+                            'assets/8b151872c2943599.s4le6a.vendor.js', 
+                            'assets/9387c6b85eab150d.vendor.js',
+                            'assets/6c10e1869b73042b.strings.js',
+                            'assets/5e477f4c90eac620.en.js',
+                            'assets/a35845dde8b2488a.js'
+                        ];
+                        
+                        for (const src of scripts) {
+                            await new Promise((resolve, reject) => {
+                                const script = document.createElement('script');
+                                script.nonce = 'e388235d-6ca3-4063-90c7-2caba25d363a';
+                                script.src = src;
+                                script.crossOrigin = 'anonymous';
+                                script.onload = resolve;
+                                script.onerror = reject;
+                                document.body.appendChild(script);
+                            });
+                        }
+                        
+                        scriptsLoaded = true;
+                        console.log('All scripts loaded successfully');
+                        
+                        // Hide loading after all scripts are loaded
+                        if (loadingEl) {
                             loadingEl.style.display = 'none';
                         }
-                    }, 500); // Small delay to ensure everything is ready
-                });
+                    } catch (error) {
+                        console.error('Failed to load scripts:', error);
+                        if (loadingEl) {
+                            loadingEl.innerHTML = '<div style="text-align: center; font-family: Arial, sans-serif;"><p style="color: #e74c3c;">Failed to load. Please refresh the page.</p></div>';
+                        }
+                    }
+                }
+
+                // Start loading scripts
+                initializeApp();
             });
         </script>
         <script nonce="e388235d-6ca3-4063-90c7-2caba25d363a">
