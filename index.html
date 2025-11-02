@@ -231,98 +231,68 @@
             )();
         </script>
         <script>
-            // Initialize the public path
-            window['__canva_public_path__'] = 'assets/';
-            
-            // Script loading with retries and timeouts
-            function loadScript(src, retries = 3) {
-                return new Promise((resolve, reject) => {
-                    const script = document.createElement('script');
-                    script.src = src;
+            // Initialize core functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                const loading = document.getElementById('loading');
+                const loadingText = document.getElementById('loadingText');
+                const loadingProgress = document.getElementById('loadingProgress');
+                let scriptsLoaded = 0;
+
+                function updateProgress() {
+                    const scripts = document.querySelectorAll('script[defer]');
+                    scriptsLoaded++;
+                    loadingProgress.textContent = `Loading ${scriptsLoaded}/${scripts.length}`;
+                }
+
+                // Listen for script load events
+                document.querySelectorAll('script[defer]').forEach(script => {
+                    script.addEventListener('load', () => {
+                        updateProgress();
+                        if (window.canva && typeof window.canva.init === 'function') {
+                            try {
+                                window.canva.init();
+                                loading.style.display = 'none';
+                            } catch (error) {
+                                console.error('Initialization error:', error);
+                                showError();
+                            }
+                        }
+                    });
                     
-                    const timeout = setTimeout(() => {
-                        script.remove();
-                        if (retries > 0) {
-                            console.log(`Retrying ${src}, attempts remaining: ${retries-1}`);
-                            loadScript(src, retries - 1).then(resolve).catch(reject);
-                        } else {
-                            reject(new Error(`Timeout loading ${src}`));
-                        }
-                    }, 5000); // 5 second timeout
-
-                    script.onload = () => {
-                        clearTimeout(timeout);
-                        resolve();
-                    };
-
-                    script.onerror = () => {
-                        clearTimeout(timeout);
-                        script.remove();
-                        if (retries > 0) {
-                            console.log(`Retrying ${src}, attempts remaining: ${retries-1}`);
-                            loadScript(src, retries - 1).then(resolve).catch(reject);
-                        } else {
-                            reject(new Error(`Failed to load ${src}`));
-                        }
-                    };
-
-                    document.body.appendChild(script);
+                    script.addEventListener('error', (e) => {
+                        console.error('Script load error:', e);
+                        showError();
+                    });
                 });
-            }
 
-            // Load scripts in order
-            async function loadAllScripts() {
-                const loadingEl = document.getElementById('loading');
-                const scripts = [
-                    'assets/fa200369325f15c3.runtime.js',
-                    'assets/8b151872c2943599.s4le6a.vendor.js',
-                    'assets/9387c6b85eab150d.vendor.js',
-                    'assets/6c10e1869b73042b.strings.js',
-                    'assets/5e477f4c90eac620.en.js',
-                    'assets/a35845dde8b2488a.js'
-                ];
-
-                try {
-                    for (let i = 0; i < scripts.length; i++) {
-                        const script = scripts[i];
-                        await loadScript(script);
-                        console.log(`Loaded ${i + 1}/${scripts.length}: ${script}`);
-                    }
-                    
-                    // Initialize after all scripts are loaded
-                    if (window.canva && typeof window.canva.init === 'function') {
-                        window.canva.init();
-                    }
-                    
-                    // Hide loading indicator
-                    if (loadingEl) {
-                        loadingEl.style.opacity = '0';
-                        setTimeout(() => {
-                            loadingEl.style.display = 'none';
-                        }, 300);
-                    }
-                } catch (error) {
-                    console.error('Script loading failed:', error);
-                    if (loadingEl) {
-                        loadingEl.innerHTML = `
+                function showError() {
+                    if (loading) {
+                        loading.innerHTML = `
                             <div style="text-align: center; font-family: Arial, sans-serif;">
-                                <p style="color: #e74c3c; margin-bottom: 15px;">Failed to load required resources.</p>
+                                <p style="color: #e74c3c; margin-bottom: 15px;">Failed to load resources</p>
                                 <button onclick="window.location.reload()" 
-                                        style="padding: 10px 20px; background: #e09f3e; border: none; 
-                                               color: white; border-radius: 4px; cursor: pointer;">
-                                    Retry
+                                        style="padding: 10px 20px; background: #e09f3e; 
+                                               border: none; color: white; border-radius: 4px; 
+                                               cursor: pointer;">
+                                    Try Again
                                 </button>
                             </div>`;
                     }
                 }
-            }
 
-            // Start loading when the DOM is ready
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', loadAllScripts);
-            } else {
-                loadAllScripts();
-            }
+                // Set a timeout for overall loading
+                setTimeout(() => {
+                    if (loading.style.display !== 'none') {
+                        showError();
+                    }
+                }, 30000); // 30 second timeout
+            });
         </script>
+        <style>
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
     </body>
 </html>
