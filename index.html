@@ -20,19 +20,26 @@
         <link rel="shortcut icon" href="assets/media/acda4e902cd10e31f0fb651e0f928625.png">
         <link rel="icon" href="assets/media/acda4e902cd10e31f0fb651e0f928625.png" sizes="192x192">
         <link rel="apple-touch-icon" href="assets/media/acda4e902cd10e31f0fb651e0f928625.png" sizes="180x180">
-        <script nonce="e388235d-6ca3-4063-90c7-2caba25d363a">
-            window['__canva_website_bootstrap__'] = JSON.parse('{"A":"DAGqsQvErfk","B":"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwia2lkIjoia2lkLTE3NDAwODM2MjAyNzEifQ..N-3qHw6X4sSsrF8q.9Soe-3_2pITxLcSHhyinWKP8Lruz3sdJe9-VM_1f-3eS0vnAxVleRYwlNb9ByrUsXejyMgGNaQ.akTls4XgBz92OCcwMVo9HQ"}');
+        <script>
+            window.addEventListener('load', function() {
+                // Initialize bootstrap data
+                window['__canva_website_bootstrap__'] = JSON.parse('{"A":"DAGqsQvErfk","B":"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwia2lkIjoia2lkLTE3NDAwODM2MjAyNzEifQ..N-3qHw6X4sSsrF8q.9Soe-3_2pITxLcSHhyinWKP8Lruz3sdJe9-VM_1f-3eS0vnAxVleRYwlNb9ByrUsXejyMgGNaQ.akTls4XgBz92OCcwMVo9HQ"}');
+                // Initialize error handlers after page load
+                window.onerror = function(msg, url, lineNo, columnNo, error) {
+                    console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
+                    return false;
+                };
+            });
         </script>
-        <script nonce="e388235d-6ca3-4063-90c7-2caba25d363a">
+        <script>
             document.addEventListener('contextmenu', (e) => {
-                const isMedia = ['img', 'image', 'video', 'svg', 'picture'].some(tagName => tagName.localeCompare(e.target.tagName, undefined, {
-                    sensitivity: 'base'
-                }) === 0, );
+                const isMedia = ['img', 'image', 'video', 'svg', 'picture'].some(tagName => 
+                    tagName.localeCompare(e.target.tagName, undefined, {sensitivity: 'base'}) === 0
+                );
                 isMedia && e.preventDefault();
-            }
-            );
+            });
         </script>
-        <script nonce="e388235d-6ca3-4063-90c7-2caba25d363a"> 
+        <script> 
             const lang = navigator.language ? navigator.language : 'en';
             window.canva_installFooter = (container) => {
                 if (!(container instanceof HTMLDivElement)) {
@@ -212,31 +219,98 @@
             )();
         </script>
         <script>
+            // Initialize the public path
             window['__canva_public_path__'] = 'assets/';
-            function loadScript(src) {
+            
+            // Script loading with retries and timeouts
+            function loadScript(src, retries = 3) {
                 return new Promise((resolve, reject) => {
                     const script = document.createElement('script');
                     script.src = src;
-                    script.onload = resolve;
-                    script.onerror = reject;
+                    
+                    const timeout = setTimeout(() => {
+                        script.remove();
+                        if (retries > 0) {
+                            console.log(`Retrying ${src}, attempts remaining: ${retries-1}`);
+                            loadScript(src, retries - 1).then(resolve).catch(reject);
+                        } else {
+                            reject(new Error(`Timeout loading ${src}`));
+                        }
+                    }, 5000); // 5 second timeout
+
+                    script.onload = () => {
+                        clearTimeout(timeout);
+                        resolve();
+                    };
+
+                    script.onerror = () => {
+                        clearTimeout(timeout);
+                        script.remove();
+                        if (retries > 0) {
+                            console.log(`Retrying ${src}, attempts remaining: ${retries-1}`);
+                            loadScript(src, retries - 1).then(resolve).catch(reject);
+                        } else {
+                            reject(new Error(`Failed to load ${src}`));
+                        }
+                    };
+
                     document.body.appendChild(script);
                 });
             }
-            
+
+            // Load scripts in order
             async function loadAllScripts() {
+                const loadingEl = document.getElementById('loading');
+                const scripts = [
+                    'assets/fa200369325f15c3.runtime.js',
+                    'assets/8b151872c2943599.s4le6a.vendor.js',
+                    'assets/9387c6b85eab150d.vendor.js',
+                    'assets/6c10e1869b73042b.strings.js',
+                    'assets/5e477f4c90eac620.en.js',
+                    'assets/a35845dde8b2488a.js'
+                ];
+
                 try {
-                    await loadScript('assets/fa200369325f15c3.runtime.js');
-                    await loadScript('assets/8b151872c2943599.s4le6a.vendor.js');
-                    await loadScript('assets/9387c6b85eab150d.vendor.js');
-                    await loadScript('assets/6c10e1869b73042b.strings.js');
-                    await loadScript('assets/5e477f4c90eac620.en.js');
-                    await loadScript('assets/a35845dde8b2488a.js');
+                    for (let i = 0; i < scripts.length; i++) {
+                        const script = scripts[i];
+                        await loadScript(script);
+                        console.log(`Loaded ${i + 1}/${scripts.length}: ${script}`);
+                    }
+                    
+                    // Initialize after all scripts are loaded
+                    if (window.canva && typeof window.canva.init === 'function') {
+                        window.canva.init();
+                    }
+                    
+                    // Hide loading indicator
+                    if (loadingEl) {
+                        loadingEl.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingEl.style.display = 'none';
+                        }, 300);
+                    }
                 } catch (error) {
-                    console.error('Failed to load script:', error);
+                    console.error('Script loading failed:', error);
+                    if (loadingEl) {
+                        loadingEl.innerHTML = `
+                            <div style="text-align: center; font-family: Arial, sans-serif;">
+                                <p style="color: #e74c3c; margin-bottom: 15px;">Failed to load required resources.</p>
+                                <button onclick="window.location.reload()" 
+                                        style="padding: 10px 20px; background: #e09f3e; border: none; 
+                                               color: white; border-radius: 4px; cursor: pointer;">
+                                    Retry
+                                </button>
+                            </div>`;
+                    }
                 }
             }
-            
-            document.addEventListener('DOMContentLoaded', loadAllScripts);
+
+            // Start loading when the DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadAllScripts);
+            } else {
+                loadAllScripts();
+            }
         </script>
     </body>
 </html>
