@@ -16,3 +16,11 @@ i’m building **ChefsCircle**, an ai-powered cooking platform, and experimentin
 ---
 
 built on caffeine, late nights, and way too many “what if” moments.
+
+# personal website
+
+finally made this thing actually work  
+repo was a mess but now it’s kinda clean and not screaming at me anymore  
+
+used react vite and tailwind because i like pain  
+css fought back but i won mostly  
